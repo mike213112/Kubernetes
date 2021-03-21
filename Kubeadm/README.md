@@ -1,4 +1,4 @@
-## En este caso estaremos usando VirtualBox para crear las maquinas virtuales
+# En este caso estaremos usando VirtualBox para crear las maquinas virtuales
 
 **Debemos tener instalado virtualbox, sino lo tienes, lo puede descargar**
 
@@ -11,6 +11,12 @@
 - 2 CPU o más.
 - Conectividad de red completa entre todas las máquinas del clúster (la red pública o privada está bien).
 - Nombre de host, dirección MAC y product_uuid únicos para cada nodo. Consulte aquí para obtener más detalles.
-- Algunos puertos están abiertos en sus máquinas. Consulte aquí para obtener más detalles.
+- Algunos puertos están abiertos en sus máquinas. Consulte [aquí](#verificar-los-puertos-requeridos) para obtener más detalles.
 - Swap desactivado. Usted DEBE desactivar de intercambio para que el kubelet para que funcione correctamente.
 - Tambien debemos tener Docker instalado en las maquinas que usaremos para el cluster.
+
+## Verificar los puertos requeridos
+
+| Protocol | Direction | Port Range   | Porpose | Used By
+| TCP | Inbound | 6443 | Kubernetes Api Server | All
+

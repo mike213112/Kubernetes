@@ -17,6 +17,7 @@
 
 ## Verificar los puertos requeridos
 
-| Protocol | Direction | Port Range   | Porpose | Used By
-| TCP | Inbound | 6443 | Kubernetes Api Server | All
+| Protocol | Direction | Port Range | Porpose | Used By |
+| -------- | --------- | ---------- | -------- | ------- |
+| TCP | Inbound | 6443 | Kubernetes Api Server | All |
 

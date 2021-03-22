@@ -265,4 +265,4 @@ kubectl get nodes
 ## **Load Balancer Configuration**
 
 - 1 Login as super users in Ubuntu
-  - ```bash sudo su```
+  - ```sudo su```

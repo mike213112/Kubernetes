@@ -1,53 +1,53 @@
 # How To Setup Kubernetes Cluster Using Kubeadm
 
-Kubeadm is an excellent tool to set up a working kubernetes cluster in 
-minutes. It does all the heavy lifting in terms of setting up all kubernetes 
+Kubeadm is an excellent tool to set up a working kubernetes cluster in
+minutes. It does all the heavy lifting in terms of setting up all kubernetes
 components. It follows all the configuration best practices for a kubernetes cluster.
 
-This post walks you through the process of setting up a kubernetes 
-cluster with one master and two worker nodes using Kubeadm. I use 
-kubeadm for all my kubernetes test clusters. You can set up the kubernetes 
+This post walks you through the process of setting up a kubernetes
+cluster with one master and two worker nodes using Kubeadm. I use
+kubeadm for all my kubernetes test clusters. You can set up the kubernetes
 cluster using kubeadm under 7 minutes.
 
 
 
-## Prerequisires:
-- Minimum two Ubuntu nodes [One master and one worker node]. 
+## **Prerequisires:**
+- Minimum two Ubuntu nodes [One master and one worker node].
 You can have more worker nodes as per your requirement.
 
 - The master node should have a minimum for 2 vCPU and 10GB memory.
 
-- 10.X.X.X/X network range for master and nodes. We will be using 
-the 192 series as the pod network range. The Calico network 
+- 10.X.X.X/X network range for master and nodes. We will be using
+the 192 series as the pod network range. The Calico network
 plugin will use this range by default.
 
 
 
-### Before you begin using Kubeadm
+## **Before you begin using Kubeadm**
 
 - A compatible Linux host. The Kubernetes project provides generic instructions for Linux distributions based on Debian and Red Hat, and those distributions without a package manager.
 - 2 GB or more of RAM per machine (any less will leave little room for your apps).
 - 2 CPUs or more.
 - Full network connectivity between all machines in the cluster (public or private network is fine).
-- Unique hostname, MAC address, and product_uuid for every node. See [here](#verify-the-mac-address-and-product_uuid are-unique-for-every-node) for more details.
+- Unique hostname, MAC address, and product_uuid for every node. See [here](#verify-the-mac-address-and-product_uuid-are-unique-for-every-node) for more details.
 - Certain ports are open on your machines. See [here](#port-requirements) for more details.
 - Swap disabled. You MUST disable swap in order for the kubelet to work properly.
 
 
 
-#### Verify the MAC address and product_uuid are unique for every node
-- You can get the MAC address of the network interfaces using the command 
+## **Verify the MAC address and product_uuid are unique for every node**
+- You can get the MAC address of the network interfaces using the command
 ip link or ifconfig -a
-- The product_uuid can be checked by using the command sudo cat 
+- The product_uuid can be checked by using the command sudo cat
 /sys/class/dmi/id/product_uuid
-It is very likely that hardware devices will have unique addresses, although some virtual 
-machines may have identical values. Kubernetes uses these values to uniquely identify 
-the nodes in the cluster. If these values are not unique to each node, the installation 
+It is very likely that hardware devices will have unique addresses, although some virtual
+machines may have identical values. Kubernetes uses these values to uniquely identify
+the nodes in the cluster. If these values are not unique to each node, the installation
 process may [fail](https://github.com/kubernetes/kubeadm/issues/31).
 
 
 
-#### Port Requirements
+## **Port Requirements**
 
 | Protocol | Direction | Port Range | Porpose | Used By |
 | -------- | --------- | ---------- | -------- | ------- |
@@ -59,30 +59,32 @@ process may [fail](https://github.com/kubernetes/kubeadm/issues/31).
 
 
 
-# We will use VirtualBox to create the virtual machines 
+# **We will use VirtualBox to create the virtual machines**
 
 **We must have virtualbox installed, if you do not have it, you can download it.**
 
 - [Download VirtualBox](https://www.virtualbox.org/wiki/Downloads)
-**We can work with Ubuntu Server or Debian.**
+
+
+### **We can work with Ubuntu Server or Debian.**
 
 - [Download Debian](https://mega.nz/file/0D5RgYSb#DXWL8B4FII3iOq3Adprz3WEORM33rut8sqffaGAlwps)
 - [Download Ubuntu Server](https://mega.nz/file/JawS2BYB#vUPwCf4i48tbmZfMUasP7l6q6re_NgB12m1xXQF0O2g)
 
 
-**Apply on all nodes(virtual machines).**
+# **Apply on all nodes(Virtual Machines).**
 
-**Install Docker in Ubuntu.**
+## **Install Docker in Ubuntu.**
 
 As a first step, we need to install Docker on all the nodes. Execute the following commands on all the nodes.
 
-**Install the required packages for Docker**
+### **Install the required packages for Docker**
 
 ```bash
 sudo apt update; sudo apt-get install apt-transport-https ca-certificates curl gnupg lsb-releas
 ```
 
-**Add the Docker GPG key and stable repository.**
+### **Add the Docker GPG key and stable repository.**
 
 ```bash
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
@@ -92,16 +94,16 @@ echo \
 $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 ```
 
-**Install the Docker Engine.**
+### **Install the Docker Engine.**
 
 ```bash
 sudo apt update; sudo apt-get install docker-ce docker-ce-cli containerd.io
 ```
 
-**Note: 
-We must be as super users to execute the following command**
+> **Note:**
+We must be as super users to execute the following command
 
-**Add the docker daemon configurations.**
+### **Add the docker daemon configurations.**
 
 ```bash
 cat > /etc/docker/daemon.json <<EOF
@@ -117,14 +119,14 @@ EOF
 ```
 
 
-**Create a service director.y**
+### **Create a service directory.**
 
 ```bash
 mkdir -p /etc/systemd/system/docker.service.d
 ```
 
 
-**Restart Docker service.**
+### **Restart Docker service.**
 
 ```bash
 systemctl daemon-reload
@@ -133,24 +135,24 @@ systemctl restart docker
 
 
 
-# Install Kubeadm
+# **Install Kubeadm**
 
 
-**Add the GPG key**
+### **Add the GPG key**
 
 ```bash
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
 ```
 
 
-**Add the Kubernetes apr repository**
+### **Add the Kubernetes apr repository**
 
 ```bash
 apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
 ```
 
 
-**Install kubeadm**
+### **Install kubeadm**
 
 ```bash
 apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
@@ -158,25 +160,25 @@ apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
 
 
 
-# Initialize Kubeadm On Master Node
+# **Initialize Kubeadm On Master Node***
 
-**Note: 
-We must be as super users to execute the following command**
+> **Note:**
+We must be as super users to execute the following command
 
 
-**Disable swap**
+### **Disable swap**
 
 ```bash
 swapoff -a
 ```
 
-**Initial kubeadm on master node with the following command. It will set up all the Kubernetes master components.**
+### **Initial kubeadm on master node with the following command. It will set up all the Kubernetes master components.**
 
 ```bash
 kubeadm init --pod-network-cidr=192.168.0.0/16
 ```
 
-**On a successful kubeadm initialization you should get the following output.**
+### **On a successful kubeadm initialization you should get the following output.**
 
 ```bash
 Your Kubernetes control-plane has initialized successfully!
@@ -203,11 +205,11 @@ kubeadm join 192.168.9.150:6443 --token 922dvt.3opyjya2e5nxon2y \
 
 In the above output, there are two important blocks.
 
-**kubeconfig:**
+### **kubeconfig:**
 
 Use the following commands from the output to create the **kubeconfig** in master so that you can use **kubectl** to interact with cluster API.
 
-**Note:** You can copy the **admin.conf** file from the master to your workstation if you don’t want to execute **kubectl** commands from the master.
+> **Note:** You can copy the **admin.conf** file from the master to your workstation if you don’t want to execute **kubectl** commands from the master.
 
 ```bash
 mkdir -p $HOME/.kube
@@ -215,7 +217,7 @@ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ```
 
-**Kubeadm Join Token**
+### **Kubeadm Join Token**
 
 The following command from the output is important to join the worker nodes to the master.
 
@@ -224,7 +226,7 @@ kubeadm join 192.168.9.150:6443 --token 922dvt.3opyjya2e5nxon2y \
     --discovery-token-ca-cert-hash sha256:1481d21c260d5e64ddc4ea135a0339820f17cdcff4e1b1ba160ffdd0ddf15c9a
 ```
 
-**Install Calico Network Plugin:**
+### **Install Calico Network Plugin:**
 
 Execute the following command to install the calico network plugin on the cluster. Make sure you execute the kubectl command from where you have configured the **kubeconfig** file.
 
@@ -238,12 +240,12 @@ Check master node status using the following command.
 kubectl get nodes
 ```
 
-**On Nodes**
+### **On Nodes**
 
 On all the nodes, execute the kubeadm join command you got from the output.
 
 ```bash
-kubeadm join 192.168.9.150:6443 --token 922dvt.3opyjya2e5nxon2y \
+kubeadm join 192.168.1.69:6443 --token 922dvt.3opyjya2e5nxon2y \
     --discovery-token-ca-cert-hash sha256:1481d21c260d5e64ddc4ea135a0339820f17cdcff4e1b1ba160ffdd0ddf15c9a
 ```
 
@@ -253,16 +255,296 @@ From the master node, execute the following command to check if the node is adde
 kubectl get nodes
 ```
 
-**Output**
+### **Output**
 
 ```bash
 
 ```
 
 
-# Initialize Kubeadm with **Load Balancer** and two **Masters**
+# Initialize Kubeadm with **Load Balancer** and **two Masters**
 
 ## **Load Balancer Configuration**
 
-- 1 Login as super users in Ubuntu
-  - ```sudo su```
+1. **Login as super users in Ubuntu**
+   * ```bash
+     sudo su
+     ```
+
+2. **Install Nginx**
+   * ```bash
+     apt install nginx -y
+     ```
+
+3. **Enable Nginx**
+   * ```bash
+     systemctl enable nginx
+     ```
+
+4. **View status the Nginx**
+   * ```bash
+     systemctl status nginx
+     ```
+
+
+> NOTE:
+If everything is correct with Our Nginx, we continue with the other configuration
+
+1. **Create a superfolder**
+   * ```bash
+     mkdir -p /etc/nginx/tcpconf.d
+     ```
+
+
+2. **Open the Nginx file**
+   * ```bash
+     nano /etc/nginx/nginx.conf
+     ```
+
+3. **Add our subfolder in the NGINX file (we must put this at the bottom of all the nginx configuration)**
+
+> **NOTE**
+Where (/ *) is for us to add everything that is inside our subfolder.
+
+4. **Add Kubernetes configuration**
+   * ```bash
+     cat <<EOF |sudo tee /etc/nginx/tcpconf.d/kubernetes.conf
+     stream {
+         upstream kubernetes {
+             server <ip del primer master>:6443;
+             server <ip del segundo master>:6443;
+         }
+
+         server {
+             listen 6443;
+             listen 443;
+             proxy_pass kubernetes;
+         }
+     }
+     EOF
+     ```
+
+> **NOTE:**
+We must know the ips of our masters, and remove <> (it only goes to the ips and the port where Kubernetes Api Server listens)
+
+1. **Reload the changes**
+   * ```bash
+     nginx -s reload
+     ```
+
+2. **View load Balancer ip**
+   * ```bash
+     hostname -I
+     ```
+
+# **Initialize Kubeadm on the first master node**
+
+1. **Login as super users in Ubuntu**
+   * ```bash
+     sudo su
+     ```
+
+2. **Disable Swap**
+   * ```bash
+     swapoff -a
+     ```
+
+   > **NOTE:**
+We deactivate the swap so that it does not give us an error, when we raise our master, the same kubernetes will tell us that we disable it
+
+
+3. **We have two ways to initialize our first master**
+   > **First option:**
+   > Initialize our first master
+   * ```bash
+     kubeadm init --control-plane-endpoint "LOAD_BALANCER_DNS:LOAD_BALANCER_PORT” --upload-certs
+     ```
+   > Second option:
+     We create a file to configure the Kubernetes api and load our Load_Balancer.
+   * ```bash
+     nano kubeadm-config.yaml
+     ```
+
+   > **We add the following in the file we create.**
+   * ```bash
+     apiVersion: kubeadm.k8s.io/v1beta2
+     kind: ClusterConfiguration
+     kubernetesVersion: stable
+     controlPlaneEndpoint: "ip del load_balancer:6443"
+     ```
+
+   > **Initialize our first master**
+   * ```bash
+     kubeadm init --config=kubeadm-config.yaml --upload-certs
+     ```
+
+   > **NOTE:** When our master gets up he will generate 2 tokens, one that is for masters and another for workers. examples
+
+   * This would be for the masters
+      ```
+      kubeadm join 192.168.1.69:6443 --token phtt6h.ofnlzjagcynoaonn --discovery-token-ca-cert-hash \ sha256:ce243060a6c049f1adb4b73a9cdc5c09fbe0faec5f3fc5c27b606edf0d695079 \
+      --control-plane --certificate-key 9997af25e442a472d1d4ee0eefe46a305f98d78a5fd55d065631ba3c6be23d10
+   * This would be for the workers
+      ```
+      kubeadm join 192.168.1.69:6443 --token phtt6h.ofnlzjagcynoaonn --discovery-token-ca-cert-hash \ sha256:ce243060a6c049f1adb4b73a9cdc5c09fbe0faec5f3fc5c27b606edf0d695079
+   > To finish with the configuration of our cluster, and that we can work with our master, kubernetes tells us that we have to do the following 3 steps.
+      * ```
+         mkdir -p $HOME/.kube
+         sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+         sudo chown $(id -u):$(id -g) $HOME/.kube/config
+4. **Apply the Kubernetes CNI**
+      * ```bash
+        kubectl apply -f https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')
+        ```
+
+5. **see the status of the pods in hot**
+   * ```bash
+     kubectl get pod -n kube-system -w
+     ```
+
+> **NOTE:**
+Once the status of our pods is RUNNING, it will take us out and we will verify the status again, to corroborate, with the command from step 5.
+
+6. **Check if our master is READY**
+   * ```bash
+     kubectl get nodes
+     ```
+
+# **Initialize Our Second Master**
+
+1. **Login as super users in Ubuntu**
+   * ```bash
+     sudo su
+     ```
+
+2. **We copy the token that the first master generated us**
+   * ```bash
+     kubeadm join 192.168.1.69:6443 --token phtt6h.ofnlzjagcynoaonn --discovery-token-ca-cert-hash \ sha256:ce243060a6c049f1adb4b73a9cdc5c09fbe0faec5f3fc5c27b606edf0d695079 \
+     --control-plane --certificate-key 9997af25e442a472d1d4ee0eefe46a305f98d78a5fd55d065631ba3c6be23d10
+     ```
+
+3. **Once finished, Kubernetes will ask us to finish the configuration, let's add the following steps.**
+   * ```
+     mkdir -p $HOME/.kube
+     sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+     sudo chown $(id -u):$(id -g) $HOME/.kube/config
+     ```
+
+4. **We verify the status of the masters**
+   * ```bash
+     kubectl get nodes
+     ```
+
+# **Join the workers to our cluster**
+
+1. **Login as super users in Ubuntu**
+   * ```bash
+     sudo su
+     ```
+
+2. **We copy the token that the first master generated us**
+   * ```bash
+     kubeadm join 192.168.1.69:6443 --token phtt6h.ofnlzjagcynoaonn --discovery-token-ca-cert-hash \ sha256:ce243060a6c049f1adb4b73a9cdc5c09fbe0faec5f3fc5c27b606edf0d695079
+     ```
+
+3. **Check if our workers joined our cluster(on any master)**
+   * ```bash
+     kubectl get nodes
+     ```
+
+# **Dashboard (we can do it for any of the 2 masters that have a graphical interface)**
+
+1. **Dashboard Deploying for the interface**
+   * ```bash
+     kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta8/aio/deploy/recommended.yaml
+     ```
+
+2. **We create the dashboar-admin.yml file(for the Role)**
+   * ```bash
+     nano dashboar-admin.yml
+     ```
+
+3. **We add the configuration to the dashboar-admin.yml file**
+   * ```bash
+     apiVersion: v1
+     kind: ServiceAccount
+     metadata:
+     name: admin-user
+     namespace: kube-system
+     ```
+
+4. **We apply the configuration file to kubernetes, for the admin role**
+   * ```bash
+     kubectl apply -f dashboar-admin.yml
+     ```
+
+5. **We create a file for the ClusterRol**
+   * ```bash
+     nano admin-role-binding.yml
+     ```
+
+6. **We add the configuration to the admin-role-binding.yml file**
+   * ```bash
+     apiVersion: rbac.authorization.k8s.io/v1
+     kind: ClusterRoleBinding
+     metadata:
+      name: admin-user
+     roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: cluster-admin
+     subjects:
+     - kind: ServiceAccount
+       name: admin-user
+       namespace: kube-system
+     ```
+
+7. **We apply the configuration file to kubernetes, for the ClusterRol**
+   * ```bash
+     kubectl apply -f admin-role-binding.yml
+     ```
+
+8. **Generate token, to be able to log in to the Dashboard page through token**
+   * ```bash
+     kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep admin-user | awk '{print $1}')
+     ```
+
+9. **To access the panel, we use the following**
+    * ```bash
+      kubectl proxy
+      ```
+
+10. **Check if everything is correct, we open our browser and we can do the following**
+    * ```bash
+      localhost:8001
+      ```
+
+> **Note:**
+If you show us a json file, we're fine
+
+
+11. **Check again if we are on the right track**
+    * ```bash
+      localhost:8001/iu
+      ```
+
+12. **Now we enter the Dashboard web page**
+    * ```bash
+      http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
+      ```
+
+> **NOTE:**
+Once we are on the web page we will give you the token option, and we copy the token that step 8 generated us
+
+
+# **If the cluster does not work or does not directly give us an error when raising the first master, Reset it and see the configuration again**
+
+1. **Reset, either master or workers**
+   * ```bash
+     kubeadm reset
+     ```
+
+2. **Delete the subfolder that has the kubernete configuration**
+   * ```bash
+     rm -rf $HOME/.kube/config
+     ```

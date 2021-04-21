@@ -657,9 +657,9 @@ Once the status of our pods is RUNNING, it will take us out and we will verify t
 
 ## **Application deployment**
   [ ] 1. **In this case we are going to show a container using our own image mikedoc1/project:latest, which we downloaded from the docker hub**
-     ```bash
+    ```bash
      kubectl create deployment test01 --image=mikedoc1/project:latest
-     ```
+    ```
 
   [ ] 2. **We can see the status of our deployment. In Kubernetes, a deployment is a pod, which can be a single container or a set of related containers. A pod will always be deployed on a single machine**
      ```bash

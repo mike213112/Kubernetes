@@ -206,7 +206,7 @@ process may [fail](https://github.com/kubernetes/kubeadm/issues/31).
 - [ ] **Install kubeadm**
 
   ```bash
-  apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
+  apt install kubelet=1.20.4-00 kubeadm=1.20.4-00 kubectl=1.20.4-00
   ```
 
 
@@ -334,7 +334,8 @@ process may [fail](https://github.com/kubernetes/kubeadm/issues/31).
 - [ ] **Output**
 
   ```bash
-
+  NAME   STATUS   ROLES                  AGE   VERSION
+  master   Ready    control-plane,master   36s   v1.20.4
   ```
 
 
@@ -390,7 +391,9 @@ process may [fail](https://github.com/kubernetes/kubeadm/issues/31).
 ---
 
 - [ ] 7. **Add our subfolder in the NGINX file (we must put this at the bottom of all the nginx configuration)**
-
+  ```bash
+  include /etc/nginx/tcpconf.d/*;
+  ```
 ---
   > ### **NOTE** Where (/ *) is for us to add everything that is inside our subfolder.
 ---
@@ -452,7 +455,7 @@ process may [fail](https://github.com/kubernetes/kubeadm/issues/31).
 - [ ] 3. **We have two ways to initialize our first master**
     - [ ] **First option:** Initialize our first master
       ```bash
-      kubeadm init --control-plane-endpoint "LOAD_BALANCER_DNS:LOAD_BALANCER_PORT” --upload-certs
+      kubeadm init --control-plane-endpoint "LOAD_BALANCER_DNS:LOAD_BALANCER_PORT" --upload-certs
       ```
 
     - [ ] **Second option:** We create a file to configure the Kubernetes api and load our Load_Balancer.
@@ -567,16 +570,16 @@ Once the status of our pods is RUNNING, it will take us out and we will verify t
 
 ---
 ---
-# **Dashboard (we can do it for any of the 2 masters that have a graphical interface)**
+## **Dashboard (we can do it for any of the 2 masters that have a graphical interface)**
 
 - [ ] 1. **Dashboard Deploying for the interface**
  *  ```bash
-     kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta8/aio/deploy/recommended.yaml
+     kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0/aio/deploy/recommended.yaml
      ```
 
 - [ ] 2. **We create the dashboar-admin.yml file(for the Role)**
      ```bash
-     nano dashboar-admin.yml
+     nano dashboard-admin.yml
      ```
 
 - [ ] 3. **We add the configuration to the dashboar-admin.yml file**
@@ -584,8 +587,8 @@ Once the status of our pods is RUNNING, it will take us out and we will verify t
      apiVersion: v1
      kind: ServiceAccount
      metadata:
-     name: admin-user
-     namespace: kube-system
+       name: admin-user
+       namespace: kube-system
      ```
 
 - [ ] 4. **We apply the configuration file to kubernetes, for the admin role**
@@ -603,7 +606,7 @@ Once the status of our pods is RUNNING, it will take us out and we will verify t
      apiVersion: rbac.authorization.k8s.io/v1
      kind: ClusterRoleBinding
      metadata:
-      name: admin-user
+       name: admin-user
      roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
@@ -649,7 +652,60 @@ Once the status of our pods is RUNNING, it will take us out and we will verify t
 
 > ### **NOTE:** Once we are on the web page we will give you the token option, and we copy the token that step 8 generated us
 
+---
+---
 
+## **Application deployment**
+  [] 1. **In this case we are going to show a container using our own image mikedoc1/project:latest, which we downloaded from the docker hub**
+     ```bash
+     kubectl create deployment test01 --image=mikedoc1/project:latest
+     ```
+
+  [] 2. **We can see the status of our deployment. In Kubernetes, a deployment is a pod, which can be a single container or a set of related containers. A pod will always be deployed on a single machine**
+     ```bash
+     kubectl get pods
+     ```
+
+  [] 3. **We can also ask for the details of our deployment, with very interesting information about the node where it has been deployed, the events, etc.**
+     ```bash
+     kubectl describe pod test01
+    ```
+
+  [] 4. **We create the app.yaml file with the following information**
+     ```bash
+     apiVersion: v1
+     kind: Pod
+     metadata:
+       name: mi-app
+       labels:
+         app: web
+     spec:
+       containers:
+         - name: front-end
+           image: nginx
+           ports:
+             - containerPort: 80
+         - name: back-end
+           image: redis
+     ```
+
+  > Expose services
+
+  [] 5. **Our implementations will only be visible from within the cluster, if we want to give visibility to our implementations we must do it like this**
+     ```bash
+     kubectl expose deployment test01 --type=LoadBalancer --port=80
+     ```
+
+  [] 6. **Where we tell kubernetes to expose port 80 of the 'test01' service using load balancing. We can see the services**
+     ```bash
+     kubectl get services
+     ```
+
+  ### **Scale services**   
+  [] 7. **Very attractive is the ease with which containerized applications can be scaled. For example, to scale the number of pods for the 'test01' service to 3**
+     ```bash
+     kubectl scale deployment --replicas=3 test01
+     ```
 
 ---
 ---

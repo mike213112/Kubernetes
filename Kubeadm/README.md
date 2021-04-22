@@ -656,22 +656,22 @@ Once the status of our pods is RUNNING, it will take us out and we will verify t
 ---
 
 ## **Application deployment**
-  [ ] 1. **In this case we are going to show a container using our own image mikedoc1/project:latest, which we downloaded from the docker hub**
+- [ ] 1. **In this case we are going to show a container using our own image mikedoc1/project:latest, which we downloaded from the docker hub**
     ```bash
      kubectl create deployment test01 --image=mikedoc1/project:latest
     ```
 
-  [ ] 2. **We can see the status of our deployment. In Kubernetes, a deployment is a pod, which can be a single container or a set of related containers. A pod will always be deployed on a single machine**
+- [ ] 2. **We can see the status of our deployment. In Kubernetes, a deployment is a pod, which can be a single container or a set of related containers. A pod will always be deployed on a single machine**
      ```bash
      kubectl get pods
      ```
 
-  [ ] 3. **We can also ask for the details of our deployment, with very interesting information about the node where it has been deployed, the events, etc.**
+- [ ] 3. **We can also ask for the details of our deployment, with very interesting information about the node where it has been deployed, the events, etc.**
      ```bash
      kubectl describe pod test01
     ```
 
-  [ ] 4. **We create the app.yaml file with the following information**
+- [ ] 4. **We create the app.yaml file with the following information**
      ```bash
      apiVersion: v1
      kind: Pod
@@ -691,18 +691,18 @@ Once the status of our pods is RUNNING, it will take us out and we will verify t
 
   > Expose services
 
-  [ ] 5. **Our implementations will only be visible from within the cluster, if we want to give visibility to our implementations we must do it like this**
+- [ ] 5. **Our implementations will only be visible from within the cluster, if we want to give visibility to our implementations we must do it like this**
      ```bash
      kubectl expose deployment test01 --type=LoadBalancer --port=80
      ```
 
-  [ ] 6. **Where we tell kubernetes to expose port 80 of the 'test01' service using load balancing. We can see the services**
+- [ ] 6. **Where we tell kubernetes to expose port 80 of the 'test01' service using load balancing. We can see the services**
      ```bash
      kubectl get services
      ```
 
   ### **Scale services**   
-  [ ] 7. **Very attractive is the ease with which containerized applications can be scaled. For example, to scale the number of pods for the 'test01' service to 3**
+- [ ] 7. **Very attractive is the ease with which containerized applications can be scaled. For example, to scale the number of pods for the 'test01' service to 3**
      ```bash
      kubectl scale deployment --replicas=3 test01
      ```
